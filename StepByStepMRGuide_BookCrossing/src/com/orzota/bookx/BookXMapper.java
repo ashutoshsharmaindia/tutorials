@@ -6,28 +6,35 @@ import java.io.IOException;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.Mapper;
+
 
 /**
  * @organisaion Orzota, Inc.
  * @author varadmeru
  */
-public class BookXMapper extends MapReduceBase implements
-		org.apache.hadoop.mapred.Mapper<LongWritable, Text, Text, IntWritable> {
+ /*
+ Updating for new MR API
+ */
+public class BookXMapper extends Mapper<LongWritable, Text, Text, IntWritable>
+{
 	private final static IntWritable one = new IntWritable(1);
 
-	/* (non-Javadoc)
-	 * @see org.apache.hadoop.mapred.Mapper#map(java.lang.Object, java.lang.Object, org.apache.hadoop.mapred.OutputCollector, org.apache.hadoop.mapred.Reporter)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.hadoop.mapred.Mapper#map(java.lang.Object,
+	 * java.lang.Object, org.apache.hadoop.mapred.OutputCollector,
+	 * org.apache.hadoop.mapred.Reporter)
 	 */
 	@Override
 	public void map(LongWritable _key, Text value,
-			OutputCollector<Text, IntWritable> output, Reporter reporter)
-			throws IOException {
+			Context context)
+			throws IOException, InterruptedException
+	{
 
 		String TempString = value.toString();
 		String[] SingleBookData = TempString.split("\";\"");
-		output.collect(new Text(SingleBookData[3]), one);
+		context.write(new Text(SingleBookData[3]), one);
 	}
 }
