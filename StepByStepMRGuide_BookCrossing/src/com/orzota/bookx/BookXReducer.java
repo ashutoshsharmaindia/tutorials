@@ -2,37 +2,43 @@
 package com.orzota.bookx;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.Reducer;
+
 
 /**
  * @organisaion Orzota, Inc.
  * @author varadmeru
  */
-public class BookXReducer extends MapReduceBase implements org.apache.hadoop.mapred.Reducer<Text, IntWritable, Text, IntWritable> {
+ 
+ /*
+ Updating for new MR API
+ */
+public class BookXReducer extends Reducer<Text, IntWritable, Text, IntWritable>
+{
 
-	/* (non-Javadoc)
-	 * @see org.apache.hadoop.mapred.Reducer#reduce(java.lang.Object, java.util.Iterator, org.apache.hadoop.mapred.OutputCollector, org.apache.hadoop.mapred.Reporter)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.hadoop.mapred.Reducer#reduce(java.lang.Object,
+	 * java.util.Iterator, org.apache.hadoop.mapred.OutputCollector,
+	 * org.apache.hadoop.mapred.Reporter)
 	 */
 	@Override
-	public void reduce(Text _key,
-			Iterator<IntWritable> values,
-			OutputCollector<Text,IntWritable> output, 
-			Reporter reporter)
-			throws IOException {
+	public void reduce(Text _key, Iterable<IntWritable> values,
+			Context context)
+			throws IOException, InterruptedException
+	{
 		Text key = _key;
 		int frequencyForYear = 0;
-		while (values.hasNext()) {
+		for(IntWritable value : values)
+		{
 			// replace ValueType with the real type of your value
-			IntWritable value = (IntWritable) values.next();
 			frequencyForYear += value.get();
 			// process value
 		}
-		output.collect(key, new IntWritable(frequencyForYear));
+		context.write(key, new IntWritable(frequencyForYear));
 	}
 }
